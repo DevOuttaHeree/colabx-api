@@ -6,7 +6,7 @@
 const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');
-const cors = require('cors'); // CORS module imported
+const cors = require('cors'); 
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 
@@ -46,7 +46,7 @@ async function connectToMongo() {
 
 // Middleware
 // 🎯 CRITICAL DEPLOYMENT CHANGE: CORS configuration FIX
-// This allows requests ONLY from your Vercel frontend domain.
+// This allows requests ONLY from your Vercel frontend domain: https://colabx-frontend.vercel.app
 app.use(cors({ 
     origin: 'https://colabx-frontend.vercel.app', 
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -55,6 +55,7 @@ app.use(cors({
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json()); // Ensure Express can parse JSON bodies
 
 connectToMongo();
 
