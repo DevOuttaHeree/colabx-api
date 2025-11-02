@@ -49,30 +49,24 @@ async function connectToMongo() {
 }
 
 // Middleware
-// 🎯 CRITICAL DEPLOYMENT CHANGE: CORS configuration FIX
-// This allows requests ONLY from your Vercel frontend domain: https://colabx-frontend.vercel.app
-app.use(cors({ 
-    origin: 'http://localhost:5500', 
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-})); 
-    // Configure CORS to allow the deployed frontend and localhost during development.
-    // Example: set CORS_ORIGINS=https://colabx-frontend.vercel.app,http://localhost:3000
-    const allowedOrigins = (process.env.CORS_ORIGINS || 'https://colabx-frontend.vercel.app,http://localhost:5500')
-        .split(',')
-        .map(s => s.trim())
-        .filter(Boolean);
+// 🎯 CRITICAL DEPLOYMENT CHANGE: CORS configuration
+// Configure CORS to allow the deployed frontend and localhost during development.
+// Example: set CORS_ORIGINS=https://colabx-frontend.vercel.app,http://localhost:3000
+const allowedOrigins = (process.env.CORS_ORIGINS || 'https://colabx-frontend.vercel.app,http://localhost:5500')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
 
-    app.use(cors({
-        origin: function(origin, callback) {
-            // Allow non-browser requests like curl or server-to-server (no origin)
-            if (!origin) return callback(null, true);
-            if (allowedOrigins.indexOf(origin) !== -1) return callback(null, true);
-            return callback(new Error('CORS policy does not allow this origin.'), false);
-        },
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        credentials: true,
-    }));
+app.use(cors({
+    origin: function(origin, callback) {
+        // Allow non-browser requests like curl or server-to-server (no origin)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) return callback(null, true);
+        return callback(new Error('CORS policy does not allow this origin.'), false);
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+}));
 
 // Use Express's built-in body parsing. Avoid duplicate body-parser usage.
 app.use(express.json());
