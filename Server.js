@@ -22,14 +22,16 @@ const port = process.env.PORT || 3001;
 // ⚠️ NOTE: Do NOT store credentials in source control or comments.
 // Set the full connection string in the MONGO_URI environment variable.
 // SRV_URI can be used as an optional local fallback (not recommended for production).
+const LOCAL_URI = "mongodb://localhost:27018";
 const SRV_URI = "mongodb+srv://anjanmahadev02_db_user:Aysspsarma1@colabxcluster.ibqs9ym.mongodb.net/?appName=CoLabXCluster";
 
-const uri = process.env.MONGO_URI || SRV_URI;
+const uri = process.env.MONGO_URI || LOCAL_URI;
 
 // Create the MongoClient. Use a short server selection timeout to fail fast on startup
 // when the DB is unreachable.
 const client = new MongoClient(uri, {
     serverSelectionTimeoutMS: 5000,
+    useUnifiedTopology: true
 });
 
 let db;
@@ -49,30 +51,13 @@ async function connectToMongo() {
 }
 
 // Middleware
-// 🎯 CRITICAL DEPLOYMENT CHANGE: CORS configuration FIX
-// This allows requests ONLY from your Vercel frontend domain: https://colabx-frontend.vercel.app
-app.use(cors({ 
-    origin: 'http://localhost:5500', 
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-})); 
-    // Configure CORS to allow the deployed frontend and localhost during development.
-    // Example: set CORS_ORIGINS=https://colabx-frontend.vercel.app,http://localhost:3000
-    const allowedOrigins = (process.env.CORS_ORIGINS || 'https://colabx-frontend.vercel.app,http://localhost:5500')
-        .split(',')
-        .map(s => s.trim())
-        .filter(Boolean);
-
-    app.use(cors({
-        origin: function(origin, callback) {
-            // Allow non-browser requests like curl or server-to-server (no origin)
-            if (!origin) return callback(null, true);
-            if (allowedOrigins.indexOf(origin) !== -1) return callback(null, true);
-            return callback(new Error('CORS policy does not allow this origin.'), false);
-        },
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        credentials: true,
-    }));
+// 🎯 CRITICAL DEPLOYMENT CHANGE: CORS configuration
+// During development, allow all origins. In production, use specific origins.
+app.use(cors({
+    origin: true, // Allow all origins during development
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true
+}));
 
 // Use Express's built-in body parsing. Avoid duplicate body-parser usage.
 app.use(express.json());
