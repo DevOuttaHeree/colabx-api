@@ -11,7 +11,7 @@ const app = express();
 
 // ✅ Allowed CORS origins
 const allowedOrigins = (process.env.CORS_ORIGINS ||
- "https://colabx-frontend.vercel.app,https://colabx-frontend.vercel.app/,http://localhost:5500,http://localhost:3000"
+ "https://colabx-frontend.vercel.app,http://localhost:5500"
 ).split(",");
 
 app.use(
